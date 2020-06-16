@@ -1,0 +1,7 @@
+#+TITLE: Language Learning Audio Splitter
+* Introduction
+This little python script can help you in the process of splitting an audio file which contains several phrases or conversation that usually comes with the books for languages learning into several files each of them with one phrase.
+Im using this in order to use this phrases on anki cards.
+
+* Dependence
+You will need the pydub package to process the audio file
