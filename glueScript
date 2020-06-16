@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# The first and only parameter of this script must be the file with
+# the list of words to translate
+
+rm gloDeck.csv
+
+# To clean up the input file , no undesired space, the last s/$// deletes the carriage return generated on windows systems
+sed -E '/^$/d;s/ +, +/g,/;s/^ +//;s/ +$//;s/$//;y/ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ/йцукенгшщзхъфывапролджэячсмитьбю/' $1 > in.csv
+i=0
+while IFS= read -r line
+do
+    i=$(echo $line | awk -F, '{print $1}' -)
+    phraseRus=$(csvawk '{print $3}' <<< "$line" | sed 's/^"//;s/"$//')
+    yandexLink="<a href=\"\"https://translate.yandex.com/?lang=ru-en&text=${phraseRus}\"\">[yandx]</a>"
+    phraseRusEdit=$(echo ${phraseRus} | sed -E 's/([[:alpha:]]*-?[[:alpha:]]*)/<a href=\"\"https:\/\/en.wiktionary.org\/wiki\/\1#Russian\"\">\1<\/a>/g')
+    phraseEn=$(csvawk '{print $2}' <<< "$line" | sed 's/^"//;s/"$//')
+    if [[ -n "$phraseEn" ]]; then
+        echo "\"${i}. ${phraseEn}\",\"<p>${phraseRusEdit}</p><p>${yandexLink}</p><p>[sound:GlossikaRussian${i}.mp3]</p>\",glossikaRussian$(( ( ( i - 1 )/50 + 1 ) * 50 ))" >> gloDeck.csv
+    fi
+done <<< $(cat in.csv)
+rm in.csv
